@@ -14,7 +14,7 @@ FirebaseJson json;
 #define API_KEY "HZ8dyhTHJ120fbeEJVRM4G0RhMXboaGi8mujk9Y5"
 int giatri =0, xacnhan1=0;
 long times=0;
-
+int dagoi=0;
 WiFiServer server(80);
 void setup() {
   Serial.begin(9600);
@@ -54,7 +54,10 @@ void loop() {
  times = millis();
  while(giatri == 1 ){
   Serial.println("NEU BAN AN TOAN HAY XAC NHAN VOI GOOGLE VOICE, NEU KHONG CUOC GOI TU DONG SE DUOC BAT DAU SAU 30 GIAY");
+  if(dagoi==0){
   thuc_hien_cuoc_goi();
+  dagoi=1;
+  }
   WiFiClient client = server.available();
   if(millis() -times >= 1000){
     Serial.println(30 - (millis() - times)/1000);
@@ -63,31 +66,34 @@ void loop() {
 // Serial.println(millis()-times);
   // Read the first line of the request
   
-if(millis() -times > 30000){
+
  digitalWrite(led, HIGH);
-   delay(1000);
-  Firebase.setInt(firebaseData, "/DATA/val",0);
-  giatri = 0;
-  delay(1000);
+   
+  
+ // giatri = 0;
+  
   //phanhoi(1);
-  guisms();
+  
   //Firebase.setInt(firebaseData, "/DATA/val",0);
   digitalWrite(led, LOW); 
-}
+
 
   String request = client.readStringUntil('\r');
   Serial.println("VOICE: "+ String(request));
   client.flush();
  if(request == "GET /h%C3%A3y%20g%E1%BB%8Di%20gi%C3%BAp%20t%C3%B4i HTTP/1.1"){
   Serial.println("TOI DA GOI GIUP BAN");
-  phanhoi(1);
+ 
  }
  if(request == "GET /t%C3%B4i%20an%20to%C3%A0n HTTP/1.1"){
-    Serial.println("TOI DA HUY CUOC GOI CHO BAN");
+    Serial.println("TOI DA GUI TIN NHAN CHO BAN");
+    guisms();
+    Firebase.setInt(firebaseData, "/DATA/val",0);
   giatri = 0;
-  Firebase.setInt(firebaseData, "/DATA/val",0);
-  delay(1000);
-  times = millis();
+  dagoi=0;i
+  //Firebase.setInt(firebaseData, "/DATA/val",0);
+  //delay(1000);
+  //times = millis();
  }
  
 // Return the response
