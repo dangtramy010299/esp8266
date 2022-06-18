@@ -144,5 +144,86 @@ void phanhoi(int tipe) {
     delay(1000);
     Serial.println("DA NGAT CUOC GOI");
  }
-}
+    
+
+    MPU6050 FINAL
+       
+#include <ESP8266WiFi.h> 
+#include <FirebaseESP8266.h> 
+#define WIFI_SSID "Tra My"   
+#define WIFI_PASSWORD "01021999"  
+#define DATABASE_URL "esptest-cf441-default-rtdb.firebaseio.com"    
+FirebaseData fbdo;  //Gọi thư viện firebase json
+
+/* 4, Define the FirebaseAuth data for authentication data */
+FirebaseAuth auth;   //nhập auth của fire base nếu ruler fire base ở false
+
+/* Define the FirebaseConfig data for config data */
+FirebaseConfig config;   //kết nối với data firebase
+
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h> //Thư viện giao tiếp 
+#include <Wire.h>          //Thư viện i2C
+Adafruit_MPU6050 mpu;   //đặt tên MPU
+void setup() {
+  Wire.begin(2,0);   //Khởi động giao tiếp i2c với chân GPIO2 là SDA và GPIO0 là SCL
+  Serial.begin(9600);  
+  WiFi.mode(WIFI_STA);  //Chế độ kết nối wìi
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD); //Bắt đầu kết nối wifi
+  while (WiFi.status() != WL_CONNECTED) {  //Nếu chưa có kết kết nối
+    Serial.print(".");                 
+    delay(1000);}
+     Serial.print("NHAP IP VAO APP: ");
  
+  Serial.print(WiFi.localIP());  //hiển thị ip của esp lên Serial
+  // put your setup code here, to run once:
+ config.database_url = DATABASE_URL;   //Kết nối với fire base bằng URL của DATA firebase
+
+  config.signer.test_mode = true; //Chế độ của data firebase(TRUE = Chế độ khóa)
+  //firebase
+  Firebase.reconnectWiFi(true);
+
+  /* Initialize the library with the Firebase authen and config */
+ Firebase.begin(&config, &auth); //Khởi động firebase
+
+  delay(1000);
+  if (!mpu.begin()) {  //Nếu không kết nối được với MPU thì báo lỗi 
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(1000);
+    pinMode(2, OUTPUT);
+    digitalWrite(2, LOW);   //Đèn led trên MCU sáng
+    
+    }}
+  
+
+}
+
+void loop() {
+  sensors_event_t a, g, temp;//Set biến 
+mpu.getEvent(&a, &g, &temp);
+  // put your main code here, to run repeatedly:
+  float giatocx = a.acceleration.x;   //đọc giá trị gia tốc từ MPU gửi về
+  float giatocy = a.acceleration.y;   //
+  float giatocz = a.acceleration.z;
+  float gocX = g.acceleration.x;   //Đọc giá trị góc từ MPU gửi về
+  float gocY = g.acceleration.y;
+  float gocZ = g.acceleration.z;
+  Serial.println("GIA TOC X: " + String(giatocx));   //In lên màn hình qua serial
+  Serial.println(String("GIA TOC Y: ") + String(giatocy)); // 
+  Serial.println(String("GIA TOC Z: ") + String(giatocz));
+  
+  Serial.println("GOC X: " + String(gocX));
+  Serial.println(String("GOC Y: ") + String(gocY));
+  Serial.println(String("GOC Z: ") + String(gocZ));
+  if(giatocx > 10 || giatocy <8 || giatocz <8){  //Nếu gia góc đọc về và gia tốc lớn hơn giá trị set thì 
+    if(gocX < -1|| gocY <-0.03|| gocZ >0.02){ 
+      //Đẩy lên fire base Thư mục chính DATA, mục con val là giá trị 1
+ Serial.printf("Set int... %s\n", Firebase.setFloat(fbdo, "/DATA/val", 1) ? "ok" : fbdo.errorReason().c_str());
+ 
+ Serial.println("PHAT HIEN TE NGA");
+  delay(100); //chờ 1s
+  }}
+  delay(500);
+}
+      
