@@ -146,17 +146,17 @@ void phanhoi(int tipe) {
  }
     
 
-    MPU6050 FINAL
+    MPU6050
        
 #include <ESP8266WiFi.h> 
 #include <FirebaseESP8266.h> 
-#define WIFI_SSID "Tra My"   
-#define WIFI_PASSWORD "01021999"  
+#define WIFI_SSID "My xinh dep nhat tren doi"   
+#define WIFI_PASSWORD "99999999"  
 #define DATABASE_URL "esptest-cf441-default-rtdb.firebaseio.com"    
-FirebaseData fbdo;  //Gọi thư viện firebase json
+FirebaseData fbdo;  //Gọi thư viện firebase  dang json
 
 /* 4, Define the FirebaseAuth data for authentication data */
-FirebaseAuth auth;   //nhập auth của fire base nếu ruler fire base ở false
+FirebaseAuth auth;   
 
 /* Define the FirebaseConfig data for config data */
 FirebaseConfig config;   //kết nối với data firebase
@@ -164,7 +164,7 @@ FirebaseConfig config;   //kết nối với data firebase
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h> //Thư viện giao tiếp 
 #include <Wire.h>          //Thư viện i2C
-Adafruit_MPU6050 mpu;   //đặt tên MPU
+Adafruit_MPU6050 mpu;   //đặt tên cho MPU
 void setup() {
   Wire.begin(2,0);   //Khởi động giao tiếp i2c với chân GPIO2 là SDA và GPIO0 là SCL
   Serial.begin(9600);  
@@ -200,7 +200,7 @@ void setup() {
 }
 
 void loop() {
-  sensors_event_t a, g, temp;//Set biến 
+  sensors_event_t a, g, temp;//Xet biến 
 mpu.getEvent(&a, &g, &temp);
   // put your main code here, to run repeatedly:
   float giatocx = a.acceleration.x;   //đọc giá trị gia tốc từ MPU gửi về
@@ -209,21 +209,21 @@ mpu.getEvent(&a, &g, &temp);
   float gocX = g.acceleration.x;   //Đọc giá trị góc từ MPU gửi về
   float gocY = g.acceleration.y;
   float gocZ = g.acceleration.z;
-  Serial.println("GIA TOC X: " + String(giatocx));   //In lên màn hình qua serial
+  Serial.println(String("GIA TOC X: ") + String(giatocx));   //In lên màn hình qua serial
   Serial.println(String("GIA TOC Y: ") + String(giatocy)); // 
   Serial.println(String("GIA TOC Z: ") + String(giatocz));
   
-  Serial.println("GOC X: " + String(gocX));
+  Serial.println(String("GOC X: ") + String(gocX));
   Serial.println(String("GOC Y: ") + String(gocY));
   Serial.println(String("GOC Z: ") + String(gocZ));
-  if(giatocx > 10 || giatocy <8 || giatocz <8){  //Nếu gia góc đọc về và gia tốc lớn hơn giá trị set thì 
-    if(gocX < -1|| gocY <-0.03|| gocZ >0.02){ 
+  if( ( giatocx >4 ) || ( giatocy >4 ) && ( giatocz >4)){  //Nếu gia góc đọc về và gia tốc lớn hơn giá trị set thì 
+    if( gocX >(-0.06) || ( gocY >(-0.04) )&& gocZ < 0){
       //Đẩy lên fire base Thư mục chính DATA, mục con val là giá trị 1
  Serial.printf("Set int... %s\n", Firebase.setFloat(fbdo, "/DATA/val", 1) ? "ok" : fbdo.errorReason().c_str());
  
  Serial.println("PHAT HIEN TE NGA");
-  delay(100); //chờ 1s
-  }}
-  delay(500);
+  delay(100); 
+  }
+  }
+  delay(1000);
 }
-      
